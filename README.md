@@ -32,7 +32,7 @@ Page 2 includes:
 - Product concentration measured with the Herfindahl-Hirschman Index (HHI).
 
 <details>
-<summary>Detailed Analysis (6 screenshots, top to bottom)</summary>
+<summary>Detailed Analysis (5 screenshots, top to bottom)</summary>
 
 ![Detailed Analysis 1](images/detailed_analysis_1.png)
 
@@ -43,8 +43,6 @@ Page 2 includes:
 ![Detailed Analysis 4](images/detailed_analysis_4.png)
 
 ![Detailed Analysis 5](images/detailed_analysis_5.png)
-
-![Detailed Analysis 6](images/detailed_analysis_6.png)
 
 </details>
 
