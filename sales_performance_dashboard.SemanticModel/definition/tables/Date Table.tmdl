@@ -1,0 +1,113 @@
+table 'Date Table'
+	lineageTag: f11f1bea-1c56-428a-af73-03187c0217c0
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 5ace5eef-bd62-41e9-9cec-2fe1ce62fd17
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: d121fe11-8968-46e2-8ecb-7597949b5bb8
+			defaultHierarchy: LocalDateTable_45e90396-6533-4f3f-a771-4a2b6290f31e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 68100e29-6ac6-4b21-b0de-4b7395e7d1bc
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 41fa5eaa-2995-416f-81b4-49ca6d4fe4f3
+		summarizeBy: sum
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: ab6ca09e-24a7-4a6b-b5e0-537e40429119
+		summarizeBy: sum
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		dataType: string
+		lineageTag: 8e7b85ac-e47a-4796-bcef-e76e81301f78
+		summarizeBy: none
+		sourceColumn: MonthName
+		sortByColumn: Month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: b7745d21-e583-424d-a854-c33f28b9ebb0
+		summarizeBy: sum
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalQuarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 8c969bc2-cbd7-478b-9a2c-d260dbcf8161
+		summarizeBy: sum
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrentQuarter
+		dataType: int64
+		formatString: 0
+		lineageTag: d85d2da0-b936-4067-b1b3-a6195d747a3d
+		summarizeBy: sum
+		sourceColumn: IsCurrentQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrentYear
+		dataType: int64
+		formatString: 0
+		lineageTag: e0ab7090-1bf5-4c48-a326-17990853d7bc
+		summarizeBy: sum
+		sourceColumn: IsCurrentYear
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Date Table' = m
+		mode: import
+		queryGroup: DIM
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(FolderPath & "Date_Table.csv"),
+				        [Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				    ),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Date", type date}, {"Year", Int64.Type}, {"Quarter", Int64.Type}, {"Month", Int64.Type}, {"FiscalYear", Int64.Type}, {"FiscalQuarter", Int64.Type}, {"IsCurrentQuarter", Int64.Type}, {"IsCurrentYear", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

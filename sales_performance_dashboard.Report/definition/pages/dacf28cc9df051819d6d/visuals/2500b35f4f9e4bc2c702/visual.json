@@ -1,0 +1,154 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "2500b35f4f9e4bc2c702",
+  "position": {
+    "x": 15.264054514480408,
+    "y": 4113.2772634329467,
+    "z": 35000,
+    "height": 177.71720613287903,
+    "width": 617.10391822827933,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Date Table"
+                    }
+                  },
+                  "Property": "FiscalYear"
+                }
+              },
+              "queryRef": "Date Table.FiscalYear",
+              "nativeQueryRef": "FiscalYear",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Date Table"
+                    }
+                  },
+                  "Property": "FiscalQuarter"
+                }
+              },
+              "queryRef": "Date Table.FiscalQuarter",
+              "nativeQueryRef": "FiscalQuarter",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "# HHI Product Concentration"
+                }
+              },
+              "queryRef": "Measure.# HHI Product Concentration",
+              "nativeQueryRef": "Product Concentration",
+              "displayName": "Product Concentration"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "%  HHI Product vs Balance"
+                }
+              },
+              "queryRef": "Measure.%  HHI Product vs Balance",
+              "nativeQueryRef": "% way to monopoly",
+              "displayName": "% way to monopoly"
+            }
+          ]
+        }
+      }
+    },
+    "expansionStates": [
+      {
+        "roles": [
+          "Columns"
+        ],
+        "levels": [
+          {
+            "queryRefs": [
+              "Date Table.FiscalYear"
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "Date Table.FiscalQuarter"
+            ],
+            "isCollapsed": true,
+            "isPinned": true
+          }
+        ],
+        "root": {}
+      }
+    ],
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "valuesOnRow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Breakdown of portfolio concentration (HHI)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'by Year and Quarter (Fiscal) · 0% = balanced, 100% = single product'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

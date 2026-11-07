@@ -1,0 +1,48 @@
+table #Aux_Measure_4
+	lineageTag: dcb24eb9-acd8-46b0-9090-8ff4706214e8
+
+	column Aux_Measure_4
+		lineageTag: cb1fe198-18d5-4266-a3aa-fca0883f9fde
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Aux_Measure_4 Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Aux_Measure_4 Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aux_Measure_4 Fields'
+		isHidden
+		lineageTag: 9f6c86a3-8b8b-49cf-8346-f2bb1203b9ee
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Aux_Measure_4 Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aux_Measure_4 Order'
+		isHidden
+		formatString: 0
+		lineageTag: 6d5db739-c3ce-4b67-9595-d2b92c41df67
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition #Aux_Measure_4 = calculated
+		mode: import
+		source =
+				{
+				    ("Avg Deal Size", NAMEOF('Measure'[$ Average Deal Size (All)]), 0),
+				    ("Avg New/Renewal Deal Size", NAMEOF('Measure'[$ Average New/Renewal Deal Size]), 1)
+				}
+
+	annotation PBI_Id = 904a9206d6a044f3876f69c0c935ff40
+

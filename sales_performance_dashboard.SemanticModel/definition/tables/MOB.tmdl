@@ -1,0 +1,18 @@
+table MOB
+	lineageTag: 78e85caa-8a3c-45d9-9c06-f3906bb6e886
+
+	column MOB
+		formatString: 0
+		lineageTag: eb35948b-ef25-4fad-a5a8-99fb3212d5e5
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [MOB]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition MOB = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 90, 1 ), "MOB", [Value] )
+
+	annotation PBI_Id = dd8ec6d161864f7faacef69f809d4a33
+

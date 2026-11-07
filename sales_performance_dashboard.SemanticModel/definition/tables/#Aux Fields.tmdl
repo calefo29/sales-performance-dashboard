@@ -1,0 +1,53 @@
+table '#Aux Fields'
+	lineageTag: 6d1e7c57-6373-4956-9ad8-d7ebae8b8805
+
+	column '#Aux Fields'
+		lineageTag: a05ef276-be54-4623-9900-c40e557918cc
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: '#Aux Fields Order'
+
+		relatedColumnDetails
+			groupByColumn: '#Aux Fields Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '#Aux Fields Fields'
+		isHidden
+		lineageTag: dae2b51e-cddd-4e9d-b2f8-818440cf05f3
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: '#Aux Fields Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column '#Aux Fields Order'
+		isHidden
+		formatString: 0
+		lineageTag: fa6945ca-ba7a-4f16-b156-3915a942ce8d
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '#Aux Fields' = calculated
+		mode: import
+		source =
+				{
+				    ("Consolidated",    NAMEOF('Sales Transactions'[#Consolidated]),    0),
+				    ("Deal Type",        NAMEOF('Sales Transactions'[DealType]),        1),
+				    ("Product", NAMEOF('Sales Transactions'[ProductCategory]), 2),
+				    ("Account Tier",     NAMEOF('Accounts'[AccountTier]),               3),
+				    ("Account Industry",        NAMEOF('Accounts'[Industry]),                  4),
+				    ("Account Region",          NAMEOF('Accounts'[Region]),                    5),
+				    ("Contract Term",    NAMEOF('Sales Transactions'[ContractTerm]),    6)
+				}
+
+	annotation PBI_Id = 19a6fba8794a45168852958b975981a1
+

@@ -1,0 +1,7 @@
+expression FolderPath = "C:\sales-performance-dashboard\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: c18cc5b3-c69e-475d-b650-8afb19106b65
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

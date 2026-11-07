@@ -1,0 +1,9 @@
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date Table'[FiscalYear],
+    'Date Table'[FiscalQuarter],
+    "Bookings",   [$ Total Bookings],
+    "Quota",      [$ Total QuarterlyQuota],
+    "Attainment", [% Quota Attainment]
+)
+ORDER BY 'Date Table'[FiscalYear], 'Date Table'[FiscalQuarter]

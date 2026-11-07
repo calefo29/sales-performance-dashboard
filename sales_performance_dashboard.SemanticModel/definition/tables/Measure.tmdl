@@ -1,0 +1,669 @@
+table Measure
+	lineageTag: fd8c6212-020e-4554-aaf9-0f5e1a747473
+
+	measure '$ Net New ARR' =
+			CALCULATE(SUM('Sales Transactions'[BookingAmount] ),FILTER(all('Sales Transactions'[DealType]),'Sales Transactions'[DealType] IN {"New Business","Expansion","Contraction"}))
+			
+			-- Blacklist model
+			--CALCULATE(sum('Sales Transactions'[BookingAmount]),FILTER(all('Sales Transactions'[DealType]),'Sales Transactions'[DealType]<>"Renewal"))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Measure 1: Net New ARR
+		lineageTag: f8138b39-9b62-43ee-98e9-eaac959791d3
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Total Bookings' = SUM('Sales Transactions'[BookingAmount] )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Measure 2: Quota Attainment %
+		lineageTag: 0cc6beda-6900-46c0-adc3-8168114e8d67
+
+	measure '$ Total QuarterlyQuota' = ```
+			
+			SUMX (
+			    SUMMARIZE ( 'Date Table', 'Date Table'[FiscalYear], 'Date Table'[FiscalQuarter]),
+			    VAR 
+			        QuarterStart = CALCULATE(MIN ('Date Table'[Date] ),ALLEXCEPT ( 'Date Table', 'Date Table'[FiscalYear], 'Date Table'[FiscalQuarter]))
+			    RETURN
+			        CALCULATE (SUM ( 'Sales Reps'[QuarterlyQuota]),'Sales Reps'[HireDate] <= QuarterStart)
+			)
+			```
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Measure 2: Quota Attainment %
+		lineageTag: db2248dd-f15c-46fa-a245-70be1097979f
+
+	measure '% Quota Attainment' = DIVIDE ( [$ Total Bookings], [$ Total QuarterlyQuota] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Measure 2: Quota Attainment %
+		lineageTag: 92303aac-8e7f-4524-b563-33a83901e330
+
+	measure '# Accounts Chur. 12m (Spec)' =
+			
+			VAR RefDate  = MAX ('Date Table'[Date])
+			VAR LimitDate = EDATE (RefDate, -12)
+			RETURN
+			    CALCULATE (DISTINCTCOUNTNOBLANK(Accounts[AccountID]), Accounts[ChurnDate] > LimitDate, Accounts[ChurnDate] <= RefDate)
+		formatString: #,0
+		displayFolder: Measure 3: Rolling 12-Month Churn Rate
+		lineageTag: 7b5cabb7-d61a-4d77-9dfd-e618b264f031
+
+	measure '# Active Acc (Spec)' =
+			
+			VAR RefDate  = MAX ('Date Table'[Date])
+			return
+			CALCULATE(DISTINCTCOUNTNOBLANK(Accounts[AccountID]),Accounts[IsChurned]=0)
+		formatString: #,0
+		displayFolder: Measure 3: Rolling 12-Month Churn Rate
+		lineageTag: 5269b5b0-4a5f-4b4f-83a3-d1a55d40cce7
+
+	measure '% Churn Rate 12M (Spec)' = DIVIDE([# Accounts Chur. 12m (Spec)], [# Active Acc (Spec)] + [# Accounts Chur. 12m (Spec)])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Measure 3: Rolling 12-Month Churn Rate
+		lineageTag: 3d1b6b75-7464-4302-a3bf-98add5747abc
+
+	measure '# Active Acc (Cohort)' =
+			
+			VAR DateRef = MAX('Date Table'[Date])
+			VAR LimitDate = EDATE(DateRef, -12)
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNTNOBLANK(Accounts[AccountID]),
+			        Accounts[FirstPurchaseDate] <= LimitDate,
+			        FILTER (ALL(Accounts[ChurnDate]),
+			            ISBLANK ( Accounts[ChurnDate] ) || Accounts[ChurnDate] > LimitDate)
+			    )
+		formatString: #,0
+		displayFolder: Measure 3: Rolling 12-Month Churn Rate
+		lineageTag: 27aa0ba7-b723-4979-857f-fa59e196964a
+
+	measure '# Accounts Chur. 12m (Cohort)' =
+			
+			VAR RefDate  = MAX ('Date Table'[Date])
+			VAR LimitDate = EDATE (RefDate, -12)
+			RETURN
+			    CALCULATE (DISTINCTCOUNTNOBLANK(Accounts[AccountID]), Accounts[FirstPurchaseDate] <= LimitDate, Accounts[ChurnDate] > LimitDate, Accounts[ChurnDate] <= RefDate)
+		formatString: #,0
+		displayFolder: Measure 3: Rolling 12-Month Churn Rate
+		lineageTag: 07e89533-6202-4c18-af33-8264e7e00e32
+
+	measure '% Churn Rate 12M (Cohort)' = DIVIDE([# Accounts Chur. 12m (Cohort)], [# Active Acc (Cohort)])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Measure 3: Rolling 12-Month Churn Rate
+		lineageTag: b2496e8a-1e1b-4694-bd6d-a6f447b8615c
+
+	measure '# Total Deals' = CALCULATE(DISTINCTCOUNTNOBLANK('Sales Transactions'[TransactionID]))
+		formatString: 0
+		displayFolder: Measure 4 Average Deal Size
+		lineageTag: 9d5772fb-76b4-419d-920f-f64f8683b896
+
+	measure '$ Average Deal Size (All)' = DIVIDE([$ Total Bookings],[# Total Deals],BLANK())
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Measure 4 Average Deal Size
+		lineageTag: ddb77e2e-4e8c-48c8-9043-cdc7bf204c63
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Average New/Renewal Deal Size' =
+			
+			VAR TotalBookings =
+			    CALCULATE (
+			        [$ Total Bookings],
+			        KEEPFILTERS('Sales Transactions'[DealType] IN { "New Business", "Renewal" } )
+			    )
+			VAR TotalTransactions =
+			    CALCULATE (
+			        [# Total Deals],
+			        KEEPFILTERS('Sales Transactions'[DealType] IN { "New Business", "Renewal" } )
+			    )
+			RETURN
+			    DIVIDE (TotalBookings, TotalTransactions)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Measure 4 Average Deal Size
+		lineageTag: 0c3a5758-1fae-494f-9a4b-d0892c9b3980
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '# Total Accounts Base' = DISTINCTCOUNTNOBLANK(Accounts[AccountID])
+		formatString: #,0
+		displayFolder: Detailed Analysis
+		lineageTag: 5ff17306-5e1a-4a24-9dc6-57801079a39c
+
+	measure '# Total Reps' = DISTINCTCOUNTNOBLANK('Sales Reps'[EmployeeID])
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 2154910f-7d52-4ec3-8b03-ec09a5a04608
+
+	measure '$ Total Bookings (Full Value)' =
+			
+			CALCULATE ([$ Total Bookings],KEEPFILTERS('Sales Transactions'[DealType] IN { "New Business", "Renewal" }))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 3b1a9fc9-428d-4039-9236-0f5cf59b66f5
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Total Expansion Bookings' = CALCULATE([$ Total Bookings],KEEPFILTERS ('Sales Transactions'[DealType] = "Expansion"))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: c3e76320-71ee-4832-b3c7-f97d044548cf
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Total Contraction Bookings' = CALCULATE([$ Total Bookings],KEEPFILTERS ('Sales Transactions'[DealType] = "Contraction"))
+		displayFolder: Detailed Analysis
+		lineageTag: 258dfcb3-33fe-44d1-b0e7-653b2e92ca50
+
+		formatStringDefinition = "$#,0;-$#,0"
+
+	measure '% of Total Bookings' = DIVIDE([$ Total Bookings],CALCULATE([$ Total Bookings], ALLSELECTED ()))
+		displayFolder: Detailed Analysis
+		lineageTag: 45e45181-c549-4dab-91d7-5dedde3f17a0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '# New Business to Renewal Ratio' =
+			
+			Var NewB = CALCULATE([$ Total Bookings], KEEPFILTERS('Sales Transactions'[DealType] = "New Business"))
+			Var Renw = CALCULATE([$ Total Bookings], KEEPFILTERS('Sales Transactions'[DealType] = "Renewal"))
+			
+			RETURN
+			DIVIDE (NewB,Renw)
+		formatString: #,0.00
+		displayFolder: Detailed Analysis
+		lineageTag: 65eeb548-0c16-46bf-87df-f1a11d25af79
+
+	measure '$ Quarterly Quota' = SUM('Sales Reps'[QuarterlyQuota])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 51083829-a60e-48bf-b721-ef61f6695b4d
+
+	measure '$ Bookings per Rep' = DIVIDE([$ Total Bookings], [# Selling Reps])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: fb89e7c5-814b-4b53-8233-e8f1ccdeca5c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% Net New ARR of Bookings' =
+			
+			VAR NewARR = [$ Net New ARR]
+			VAR AllB = CALCULATE([$ Total Bookings], ALL('Sales Transactions'[DealType]))
+			
+			Return
+			DIVIDE (NewARR,AllB)
+		formatString: 0%;-0%;0%
+		displayFolder: Detailed Analysis
+		lineageTag: 3b0d548c-571f-40a9-9d52-7750a23129a0
+
+	measure '$ Bookings per Account' = DIVIDE([$ Total Bookings],[# Accounts Covered])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Detailed Analysis
+		lineageTag: 8b72a635-304d-4889-8c46-fbb3b2d23c73
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '# Untouched Accounts' =
+			
+			COUNTROWS ( FILTER ( Accounts, [# Accounts Covered] = 0 ) )
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 20c807b3-57c5-4dab-b9e5-4bde430b43c5
+
+	measure '$ Average Expansion' =
+			
+			VAR TotalBookings = [$ Total Expansion Bookings]
+			VAR TotalDeals = CALCULATE ([# Total Deals], KEEPFILTERS('Sales Transactions'[DealType] = "Expansion"))
+			
+			Return
+			DIVIDE (TotalBookings,TotalDeals)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 80c02277-4836-42a6-8d03-ec7dca299fcf
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Average Contraction' =
+			
+			VAR TotalBookings = [$ Total Contraction Bookings]
+			VAR TotalDeals = CALCULATE ([# Total Deals], KEEPFILTERS('Sales Transactions'[DealType] = "Contraction"))
+			
+			Return
+			DIVIDE (TotalBookings,TotalDeals)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: a84e6253-2675-446e-986a-0953542327de
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% Retention Rate 12M' = 1 - [% Churn Rate 12M (Spec)]
+		displayFolder: Detailed Analysis
+		lineageTag: c3b79114-c815-477d-90a3-e52b29bb49ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '# Accounts with Expansion' = ```
+			
+			COUNTROWS 
+			(
+			    FILTER 
+			    (
+			        Accounts,
+			        CALCULATE([# Total Deals],KEEPFILTERS('Sales Transactions'[DealType] = "Expansion")) > 0
+			    )
+			)
+			```
+		formatString: #,0
+		displayFolder: Detailed Analysis
+		lineageTag: dd23e790-23fe-4a85-9fdf-c1c5b1d8c517
+
+	measure '# Accounts with Contraction' = ```
+			
+			COUNTROWS 
+			(
+			    FILTER 
+			    (
+			        Accounts,
+			        CALCULATE([# Total Deals],KEEPFILTERS('Sales Transactions'[DealType] = "Contraction")) < 0
+			    )
+			)
+			```
+		formatString: #,0
+		displayFolder: Detailed Analysis
+		lineageTag: a37d6d90-5888-45e5-a31c-7f54a1f55334
+
+	measure '% Expansion Rate (Acc)' = DIVIDE([# Accounts with Expansion],[# Total Accounts Base])
+		displayFolder: Detailed Analysis
+		lineageTag: 0f95838d-f0d2-4632-b337-009c9c82c5af
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Contraction Rate (Acc)' = DIVIDE([# Accounts with Contraction],[# Total Accounts Base])
+		displayFolder: Detailed Analysis
+		lineageTag: dd54b748-4d24-475b-a49f-28912cb1bad8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Expansion Rate' = DIVIDE ([$ Total Expansion Bookings],[$ Total Bookings (Full Value)])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Detailed Analysis
+		lineageTag: 422d852b-f659-453f-9b5e-b218925dfa27
+
+	measure '% Contraction Rate ($)' = DIVIDE ([$ Total Contraction Bookings],[$ Total Bookings (Full Value)])
+		displayFolder: Detailed Analysis
+		lineageTag: 628bfbb5-d1bd-4f69-9380-abc2f42bc136
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Net Expansion Rate' = DIVIDE([$ Total Expansion Bookings] + [$ Total Contraction Bookings], [$ Total Bookings (Full Value)])
+		displayFolder: Detailed Analysis
+		lineageTag: c050aae4-d8c3-47f5-b77e-43adc48d38b2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '$ TCV' = SUMX ('Sales Transactions','Sales Transactions'[BookingAmount] * 'Sales Transactions'[ContractTerm] / 12)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 657714f2-79c4-4aec-b37a-4f02abab95b7
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ TCV per Rep' = DIVIDE ([$ TCV], [# Total Reps])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: e5f3b19a-941b-4463-8887-3a261483bb45
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ TCV per Deals' = DIVIDE ([$ TCV], [# Total Deals])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 178da71b-cca7-45a2-a3b7-5697db5ccc18
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '# TCV to ARR Ratio' = DIVIDE([$ TCV],[$ Total Bookings])
+		displayFolder: Detailed Analysis
+		lineageTag: a4943b21-fb67-4d6f-9300-619d17ade439
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Deals 36-Month' = ```
+			
+			Var TotalD = [# Total Deals]
+			Var LongC  = CALCULATE ([# Total Deals], KEEPFILTERS('Sales Transactions'[ContractTerm] = 36))
+			
+			RETURN
+			DIVIDE 
+			(LongC,TotalD)
+			```
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: e17671a4-5c9b-45a1-9206-9bea0fc169f3
+
+	measure '# HHI Product Concentration' = ```
+			-- Herfindahl-Hirschman Index
+			Var TotalB = CALCULATE ( [$ Total Bookings], ALL ( 'Sales Transactions'[ProductCategory] ) )
+			
+			RETURN
+			    SUMX (
+			        ALL('Sales Transactions'[ProductCategory]),
+			        VAR SharePct = DIVIDE ( CALCULATE ( [$ Total Bookings] ), TotalB ) * 100
+			        RETURN 
+			        SharePct * SharePct
+			    )
+			```
+		displayFolder: Detailed Analysis
+		lineageTag: ef26908e-80ea-49fc-b18a-6b3ee4e5d135
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '%  HHI Product vs Balance' =
+			
+			Var N = CALCULATE(DISTINCTCOUNT('Sales Transactions'[ProductCategory]),ALL('Sales Transactions'[ProductCategory]))
+			Var PerfectBalance = DIVIDE ( 10000, N )
+			RETURN
+			    DIVIDE ([# HHI Product Concentration] - PerfectBalance, 10000 - PerfectBalance)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Detailed Analysis
+		lineageTag: d1a2a98b-b555-4c36-8da3-8170db7399ee
+
+	measure '@ Portfolio Concentration Status' =
+			
+			Var Ratio = [%  HHI Product vs Balance]
+			
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        Ratio = 0.00, "Perfect Equ.",
+			        Ratio < 0.05, "Balanced",
+			        Ratio < 0.25, "Moderately Concentrated",
+			        Ratio < 1,"Highly concentrated",
+			        "Monopoly"
+			    )
+		displayFolder: Detailed Analysis
+		lineageTag: 3b104540-0b07-482a-98d1-3409ad123f33
+
+	measure '# Reps in Territory' = CALCULATE ([# Total Reps],TREATAS( VALUES(Accounts[Region] ),'Sales Reps'[Territory]))
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: b391917d-c593-42b5-a526-c38df6767715
+
+	measure '$ Quota in Territory' = CALCULATE(SUM('Sales Reps'[QuarterlyQuota]),TREATAS( VALUES (Accounts[Region] ),'Sales Reps'[Territory]))
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 4343d734-9605-4390-8125-09aecce3a418
+
+	measure '# Quarters Above Quota' = ```
+			
+			SUMX (VALUES('Sales Reps'[EmployeeID] ),
+			                        SUMX 
+			                        (
+			                                SUMMARIZE('Date Table', 'Date Table'[FiscalYear], 'Date Table'[FiscalQuarter] ),
+			                                IF(CALCULATE([% Quota Attainment])>= 1, 1, 0 )
+			                        )
+			)
+			```
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 05e7825a-2e4c-4784-a748-4f5deeed432b
+
+	measure '# Reps Above Quota' =
+			
+			COUNTROWS (FILTER (VALUES('Sales Reps'[EmployeeID]),CALCULATE([% Quota Attainment]) >= 1))
+		displayFolder: Detailed Analysis
+		lineageTag: 31c19491-8db1-4483-bd0a-9d75436c27fb
+
+		formatStringDefinition = "0"" of " & [# Total Reps] & """"
+
+	measure '$ Calibrated Quota' =
+			
+			VAR AllQuarters =CALCULATE (COUNTROWS ( SUMMARIZE ( 'Date Table', 'Date Table'[FiscalYear], 'Date Table'[FiscalQuarter] ) ),REMOVEFILTERS ())
+			VAR GlobalRate =DIVIDE (CALCULATE ( [$ Total Bookings], REMOVEFILTERS () ),CALCULATE ( [# Total Accounts Base], REMOVEFILTERS () ) * AllQuarters)
+			RETURN
+			    GlobalRate * [# Total Accounts Base]
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 7385c9a5-7d2c-4b30-aed0-84e4707389fe
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Calibrated Quota per Rep' = DIVIDE ([$ Calibrated Quota], [# Reps in Territory])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: f4439958-5a03-447b-8642-6a9ab6d16940
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% Attainment vs Territory Average' =
+			
+			VAR RepAttainment = [% Quota Attainment]
+			VAR TerritoryAttainment = CALCULATE ( [% Quota Attainment], ALLEXCEPT ( 'Sales Reps', 'Sales Reps'[Territory] ) )
+			RETURN
+			    DIVIDE ( RepAttainment, TerritoryAttainment )
+		displayFolder: Detailed Analysis
+		lineageTag: 03814f32-4561-4782-905a-3e6d569f900f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% In-Territory Deals' =
+			
+			VAR InTerritory =SUMX (VALUES('Sales Reps'[Territory] ),CALCULATE ([# Total Deals],TREATAS ( VALUES ('Sales Reps'[Territory] ),Accounts[Region])))
+			RETURN
+			    DIVIDE ( InTerritory, [# Total Deals])
+		displayFolder: Detailed Analysis
+		lineageTag: c7eac3a2-bdf0-4a34-9047-1a52aa935ae9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '# Transacting Accounts' = DISTINCTCOUNT('Sales Transactions'[AccountID] )
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 3cc6d1c5-9528-4f2c-9b38-e152c131e7e6
+
+	measure '# Churned Transacting Accounts' = CALCULATE(DISTINCTCOUNT('Sales Transactions'[AccountID]), Accounts[IsChurned] = 1 )
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 13ef0bd4-8b41-4205-9638-19fb4c7fb471
+
+	measure '% Churn Rate (Transacting Accounts)' = DIVIDE([# Churned Transacting Accounts],[# Transacting Accounts])
+		displayFolder: Detailed Analysis
+		lineageTag: ca2e7cc6-4df3-4df7-bc65-16a19b5e6193
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Surviving' =
+			
+			VAR M = MAX ( 'MOB'[MOB] )
+			VAR CohortStart = MIN ( Accounts[FirstPurchaseDate] )
+			VAR LastData = CALCULATE ( MAX ( 'Date Table'[Date] ), REMOVEFILTERS () )
+			VAR MaxObservable = DATEDIFF ( CohortStart, LastData, MONTH )
+			VAR CohortSize = COUNTROWS ( Accounts )
+			VAR ChurnedByM =
+			    COUNTROWS (
+			        FILTER (
+			            Accounts,
+			            NOT ISBLANK ( Accounts[ChurnDate] )
+			                && DATEDIFF ( Accounts[FirstPurchaseDate], Accounts[ChurnDate], MONTH ) <= M
+			        )
+			    )
+			RETURN
+			    IF ( M <= MaxObservable, DIVIDE ( CohortSize - ChurnedByM, CohortSize ) )
+		displayFolder: Detailed Analysis
+		lineageTag: 25b8a9cc-6c0d-4659-908c-0b9afccc6428
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '@ Cohort Pos (by MOB)' =
+			
+			VAR Cur = [% Surviving]
+			VAR Peers =
+			    FILTER ( ALLSELECTED ( Accounts[# Cohort] ), NOT ISBLANK ( [% Surviving] ) )
+			VAR PeerCount = COUNTROWS ( Peers )
+			VAR MinV = MINX ( Peers, [% Surviving] )
+			VAR MaxV = MAXX ( Peers, [% Surviving] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( Cur ), BLANK (),
+			        PeerCount < 4, 0.9,
+			        MaxV = MinV, 1,
+			        DIVIDE ( Cur - MinV, MaxV - MinV )
+			    )
+		displayFolder: Detailed Analysis
+		lineageTag: 028261b5-7478-4cfa-a717-9f5aa7526bfe
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '@ Cohort Color (by MOB)' =
+			
+			VAR Pos = [@ Cohort Pos (by MOB)]
+			VAR Hex = "0123456789ABCDEF"
+			VAR R = INT ( 10  + 245 * Pos )
+			VAR G = INT ( 102 + 153 * Pos )
+			VAR B = INT ( 194 + 61  * Pos )
+			VAR RH = MID ( Hex, INT ( R / 16 ) + 1, 1 ) & MID ( Hex, MOD ( R, 16 ) + 1, 1 )
+			VAR GH = MID ( Hex, INT ( G / 16 ) + 1, 1 ) & MID ( Hex, MOD ( G, 16 ) + 1, 1 )
+			VAR BH = MID ( Hex, INT ( B / 16 ) + 1, 1 ) & MID ( Hex, MOD ( B, 16 ) + 1, 1 )
+			RETURN
+			    IF ( ISBLANK ( Pos ), BLANK (), "#" & RH & GH & BH )
+		displayFolder: Detailed Analysis
+		lineageTag: c0b6b75c-ffa1-46ae-b3c8-7663de0667c0
+
+	measure '@ Cohort Font (by MOB)' =
+			
+			VAR Pos = [@ Cohort Pos (by MOB)]
+			RETURN
+			    IF ( ISBLANK ( Pos ), BLANK (), IF ( Pos < 0.45, "#FFFFFF", "#1B1B1B" ) )
+		displayFolder: Detailed Analysis
+		lineageTag: f87e8a78-4d01-40f7-9c1e-07bf7e647f56
+
+	measure '# Surviving Accounts' =
+			
+			VAR M = MAX ( 'MOB'[MOB] )
+			VAR CohortStart = MAX ( Accounts[FirstPurchaseDate] )
+			VAR LastData = CALCULATE ( MAX ( 'Date Table'[Date] ), REMOVEFILTERS () )
+			VAR MaxObservable = DATEDIFF ( CohortStart, LastData, MONTH )
+			VAR CohortSize = COUNTROWS ( Accounts )
+			VAR ChurnedByM =
+			    CALCULATE (
+			        COUNTROWS ( Accounts ),
+			        Accounts[# Lifetime Months] <= M,
+			        NOT ISBLANK ( Accounts[# Lifetime Months] )
+			    )
+			RETURN
+			    IF ( M <= MaxObservable, CohortSize - ChurnedByM )
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: a114b573-5e7d-41b9-ab87-d19cdd6e3d5d
+
+	measure '# Accounts Lost' =
+			
+			VAR M = MAX ( 'MOB'[MOB] )
+			VAR CohortStart = MAX ( Accounts[FirstPurchaseDate] )
+			VAR LastData = CALCULATE ( MAX ( 'Date Table'[Date] ), REMOVEFILTERS () )
+			VAR MaxObservable = DATEDIFF ( CohortStart, LastData, MONTH )
+			VAR ChurnedByM =
+			    CALCULATE (
+			        COUNTROWS ( Accounts ),
+			        Accounts[# Lifetime Months] <= M,
+			        NOT ISBLANK ( Accounts[# Lifetime Months] )
+			    )
+			RETURN
+			    IF ( M <= MaxObservable, ChurnedByM + 0 )
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: fa02f238-1313-4ae2-bb2b-4fa79319a071
+
+	measure '$ Quota per Account' =
+			
+			VAR QuartersInScope = COUNTROWS(SUMMARIZE('Date Table','Date Table'[FiscalYear],'Date Table'[FiscalQuarter]))
+			RETURN
+			    DIVIDE ( [$ Quota in Territory] * QuartersInScope, [# Total Accounts Base] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Detailed Analysis
+		lineageTag: 3d444d1d-fe43-40c6-b55b-4d97698e551a
+
+	measure '# Accounts in Territory' =
+			
+			CALCULATE (
+			    COUNTROWS ( Accounts ),
+			    TREATAS ( VALUES ( 'Sales Reps'[Territory] ), Accounts[Region] )
+			)
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: 9de27af8-4975-4cc0-9cea-7bfd85014c52
+
+	measure '# Selling Reps' = DISTINCTCOUNT ('Sales Transactions'[OpportunityOwnerID])
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: ff46eeb2-2b38-4b8b-851d-d4cd68c7b1e1
+
+	measure '# Accounts Covered' = DISTINCTCOUNT ( 'Sales Transactions'[AccountID] )
+		formatString: 0
+		displayFolder: Detailed Analysis
+		lineageTag: d5cf9f25-d78f-46c7-9be4-3e20820fb701
+
+	measure '$ Quota Gap' = [$ Total Bookings] - [$ Total QuarterlyQuota]
+		displayFolder: Detailed Analysis
+		lineageTag: 60f24cc4-8a1e-46ce-abfc-9f297f9d2fe3
+
+		formatStringDefinition = "$#,0;-$#,0"
+
+	measure '$ Bookings per Account (by Industry)' = DIVIDE ( [$ Total Bookings], [# Accounts Covered] )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 0ea2e052-4876-4b93-ab99-3690e2ef05d3
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '$ Untoched Opportunity' = [$ Bookings per Account] * [# Untouched Accounts]
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 04a7ee63-75ed-4084-8474-77f0ffdf627c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% Untouched Accounts' = [# Untouched Accounts] / [# Total Accounts Base]
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Detailed Analysis
+		lineageTag: f89e5f01-bff1-4a26-b157-0b821e4e0282
+
+	measure '$ Bookings per Account (Base)' = DIVIDE ( [$ Total Bookings], [# Total Accounts Base] )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Detailed Analysis
+		lineageTag: 303059f4-d898-4391-8085-863128cde665
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% of Required Ticket' = DIVIDE ( [$ Bookings per Account (Base)], [$ Quota per Account] )
+		formatString: 0%;-0%;0%
+		displayFolder: Detailed Analysis
+		lineageTag: e1196537-1640-4749-8108-0adc7683b6f2
+
+	column Column1
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 997b9300-a6e2-408f-b2b5-bd47caf9d772
+		summarizeBy: sum
+		sourceColumn: Column1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Measure = m
+		mode: import
+		queryGroup: MESURES
+		source =
+				let
+				    Source = #table(
+				        type table [Column1 = Int64.Type],
+				        {{null}}
+				    )
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

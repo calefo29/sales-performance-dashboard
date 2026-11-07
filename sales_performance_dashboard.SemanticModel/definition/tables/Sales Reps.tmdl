@@ -1,0 +1,99 @@
+table 'Sales Reps'
+	lineageTag: 123cfef4-7570-4087-b128-bd87230009e6
+
+	column EmployeeID
+		dataType: string
+		lineageTag: 61537cc7-daad-499d-836d-db5caf6b09ea
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+		annotation SummarizationSetBy = Automatic
+
+	column RepName
+		dataType: string
+		lineageTag: b9df9355-2604-458b-a714-117dd104e8ff
+		summarizeBy: none
+		sourceColumn: RepName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Territory
+		dataType: string
+		lineageTag: 1a6132dc-e5af-473c-a4d6-f527d998c2ba
+		summarizeBy: none
+		sourceColumn: Territory
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 7859bda4-1d3c-4d01-a79a-574bc684b931
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column HireDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: fadade70-38e3-486e-ad2c-7c3b1562a52f
+		summarizeBy: none
+		sourceColumn: HireDate
+
+		variation Variation
+			isDefault
+			relationship: d229b8f1-08c8-46c5-93a5-dcf2e92fdf68
+			defaultHierarchy: LocalDateTable_181e77b3-9816-402d-b591-f028f789eeba.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column QuarterlyQuota
+		dataType: int64
+		formatString: 0
+		lineageTag: 1c197299-710f-413f-b4cd-536214dbd936
+		summarizeBy: sum
+		sourceColumn: QuarterlyQuota
+
+		annotation SummarizationSetBy = Automatic
+
+	column ManagerID
+		dataType: string
+		lineageTag: 56169722-e563-4b84-81f3-4ef1a119eb70
+		summarizeBy: none
+		sourceColumn: ManagerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ManagerName =
+			
+			LOOKUPVALUE(
+			    'Sales Reps'[RepName],
+			    'Sales Reps'[EmployeeID],
+			    'Sales Reps'[ManagerID]
+			)
+		lineageTag: 1fc9ca5d-927b-4b2c-a3eb-1160466704cc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Sales Reps' = m
+		mode: import
+		queryGroup: DIM
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(FolderPath & "Sales_Reps.csv"),
+				        [Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				    ),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"HireDate", type date}, {"QuarterlyQuota", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"", "_1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

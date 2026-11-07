@@ -1,0 +1,282 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "e761085b3f8c92cbd46f",
+  "position": {
+    "x": 708.68824531516179,
+    "y": 1842.5894378194207,
+    "z": 23000,
+    "height": 230.0511073253833,
+    "width": 556.04770017035776,
+    "tabOrder": 32000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Accounts"
+                    }
+                  },
+                  "Property": "Region"
+                }
+              },
+              "queryRef": "Accounts.Region",
+              "nativeQueryRef": "Region",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "# Reps in Territory"
+                }
+              },
+              "queryRef": "Measure.# Reps in Territory",
+              "nativeQueryRef": "Reps in Territory",
+              "displayName": "Reps in Territory"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "# Accounts Covered"
+                }
+              },
+              "queryRef": "Measure.# Accounts Covered",
+              "nativeQueryRef": "Accounts Covered",
+              "displayName": "Accounts Covered"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "# Untouched Accounts"
+                }
+              },
+              "queryRef": "Measure.# Untouched Accounts",
+              "nativeQueryRef": "Untouched Accounts",
+              "displayName": "Untouched Accounts"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "$ Quota per Account"
+                }
+              },
+              "queryRef": "Measure.$ Quota per Account",
+              "nativeQueryRef": "Quota per Account (Base)",
+              "displayName": "Quota per Account (Base)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "$ Bookings per Account"
+                }
+              },
+              "queryRef": "Measure.$ Bookings per Account",
+              "nativeQueryRef": "Bookings per Account (Real)",
+              "displayName": "Bookings per Account (Real)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "% of Required Ticket"
+                }
+              },
+              "queryRef": "Measure.% of Required Ticket",
+              "nativeQueryRef": "% of Required Ticket"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87.27634194831013D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Measure.$ Quota per Account"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "73.3737523787539D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Measure.# Untouched Accounts"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "60.911361244593756D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Measure.# Accounts Covered"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "59.12113080588932D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Measure.# Reps in Territory"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77.46205891706202D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Measure.% of Required Ticket"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "89.04460898629075D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Measure.$ Bookings per Account"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Territory coverage and quota load by region'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'by Account Region · reps, accounts, and quota per account'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

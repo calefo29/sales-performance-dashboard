@@ -1,0 +1,10 @@
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date Table'[Year],
+    'Date Table'[Month],
+    "Churned 12M", [# Accounts Chur. 12m (Spec)],
+    "Active",      [# Active Acc (Spec)],
+    "Denominator", [# Active Acc (Spec)] + [# Accounts Chur. 12m (Spec)],
+    "Churn Rate",  [% Churn Rate 12M (Spec)]
+)
+ORDER BY 'Date Table'[Year], 'Date Table'[Month]

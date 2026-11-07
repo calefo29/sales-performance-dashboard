@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "tabOrder": [
+    "Measure 1 Net New ARR",
+    "Measure 2 Quota Attainment %",
+    "Measure 3 Rolling 12-Month Churn Rate",
+    "Measure 4 Average Deal Size"
+  ],
+  "defaultTab": "Measure 4 Average Deal Size"
+}

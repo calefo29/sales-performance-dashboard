@@ -1,0 +1,32 @@
+relationship AutoDetected_898fc23e-19eb-4cb3-80a4-116dea09fd98
+	fromColumn: 'Sales Transactions'.AccountID
+	toColumn: Accounts.AccountID
+
+relationship 036b6029-8174-6643-309f-178bf36cda4b
+	fromColumn: 'Sales Transactions'.OpportunityOwnerID
+	toColumn: 'Sales Reps'.EmployeeID
+
+relationship bf3c9084-95e1-0893-9022-0b3daa60e3de
+	fromColumn: 'Sales Transactions'.CloseDate
+	toColumn: 'Date Table'.Date
+
+relationship 5ab11d17-a59c-407e-b9b7-adbf443da637
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Accounts.FirstPurchaseDate
+	toColumn: LocalDateTable_f1bf9dca-a144-4ee8-ad62-b06044c33941.Date
+
+relationship 2b9c397a-cc5e-4895-8db3-ce895d0f9648
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Accounts.ChurnDate
+	toColumn: LocalDateTable_e5605e31-df23-43c0-97f1-d79f8100cdd2.Date
+
+relationship d121fe11-8968-46e2-8ecb-7597949b5bb8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Date Table'.Date
+	toColumn: LocalDateTable_45e90396-6533-4f3f-a771-4a2b6290f31e.Date
+
+relationship d229b8f1-08c8-46c5-93a5-dcf2e92fdf68
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Sales Reps'.HireDate
+	toColumn: LocalDateTable_181e77b3-9816-402d-b591-f028f789eeba.Date
+

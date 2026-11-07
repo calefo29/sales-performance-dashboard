@@ -1,0 +1,136 @@
+table Accounts
+	lineageTag: 154c4137-d633-44ad-a8ee-ce11bf4de00c
+
+	column AccountID
+		dataType: string
+		lineageTag: aa087bd2-bb14-453e-989b-cc46982c4c25
+		summarizeBy: none
+		sourceColumn: AccountID
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountName
+		dataType: string
+		lineageTag: 067cb9dd-47cc-45d2-95ec-e252da4a99d1
+		summarizeBy: none
+		sourceColumn: AccountName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Industry
+		dataType: string
+		lineageTag: 6f62d32f-5979-406e-9073-9911b2a50f41
+		summarizeBy: none
+		sourceColumn: Industry
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmployeeCount
+		dataType: int64
+		formatString: 0
+		lineageTag: 630d7489-e954-444d-8551-9e2469bc8e19
+		summarizeBy: sum
+		sourceColumn: EmployeeCount
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountTier
+		dataType: string
+		lineageTag: 90503eae-4f91-489d-8adc-c9049eb8bbd7
+		summarizeBy: none
+		sourceColumn: AccountTier
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 254af656-23d5-458c-a5ae-0736b1bf6256
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column FirstPurchaseDate
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: eaba97bb-c561-427f-ad59-42fe37f95644
+		summarizeBy: none
+		sourceColumn: FirstPurchaseDate
+
+		variation Variation
+			isDefault
+			relationship: 5ab11d17-a59c-407e-b9b7-adbf443da637
+			defaultHierarchy: LocalDateTable_f1bf9dca-a144-4ee8-ad62-b06044c33941.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column IsChurned
+		dataType: int64
+		formatString: 0
+		lineageTag: a50f5b66-2096-480b-bb1d-5ab9cf2f296f
+		summarizeBy: sum
+		sourceColumn: IsChurned
+
+		annotation SummarizationSetBy = Automatic
+
+	column ChurnDate
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 438acbe5-6a0c-47c1-945e-d6f9cd29171e
+		summarizeBy: none
+		sourceColumn: ChurnDate
+
+		variation Variation
+			isDefault
+			relationship: 2b9c397a-cc5e-4895-8db3-ce895d0f9648
+			defaultHierarchy: LocalDateTable_e5605e31-df23-43c0-97f1-d79f8100cdd2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column '# Cohort' = FORMAT ( Accounts[FirstPurchaseDate], "YYYY-MM" )
+		lineageTag: 4b7d73d0-0b8e-4eb3-b9a9-dca582fcc48f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '# Lifetime Months' =
+			
+			IF (
+			    ISBLANK ( Accounts[ChurnDate] ),
+			    BLANK (),
+			    DATEDIFF ( Accounts[FirstPurchaseDate], Accounts[ChurnDate], MONTH )
+			)
+		formatString: 0
+		lineageTag: 82d9d0be-d8c5-4593-a3bc-d8e7730565f9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Accounts = m
+		mode: import
+		queryGroup: DIM
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(FolderPath & "Accounts.csv"),
+				        [Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				    ),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"EmployeeCount", Int64.Type}, {"FirstPurchaseDate", type date}, {"IsChurned", Int64.Type}, {"ChurnDate", type datetime}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Changed Type",{{"ChurnDate", type date}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type1",{{"AccountName", Text.Trim, type text}})
+				in
+				    #"Trimmed Text"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

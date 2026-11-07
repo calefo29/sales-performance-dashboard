@@ -1,0 +1,105 @@
+table 'Sales Transactions'
+	lineageTag: 79f823ff-082b-44ab-80d9-0cefdc9e6b68
+
+	column TransactionID
+		dataType: string
+		lineageTag: f3cebb4c-af44-4b33-bf29-665d10ddc38d
+		summarizeBy: none
+		sourceColumn: TransactionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountID
+		dataType: string
+		lineageTag: 4c890a6b-7497-4ba0-aebd-aa1823956dce
+		summarizeBy: none
+		sourceColumn: AccountID
+
+		annotation SummarizationSetBy = Automatic
+
+	column OpportunityOwnerID
+		dataType: string
+		lineageTag: e9b50042-95de-43af-a3d2-b9507405c9a6
+		summarizeBy: none
+		sourceColumn: OpportunityOwnerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CloseDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 2e2da6a7-693b-436f-a6e2-0f0b7c6a167a
+		summarizeBy: none
+		sourceColumn: CloseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column BookingAmount
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: a20c6a97-f80a-420b-a476-c5ec19d7d214
+		summarizeBy: sum
+		sourceColumn: BookingAmount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column ProductCategory
+		dataType: string
+		lineageTag: 59d8e674-4575-4b61-aef0-c5b715ccd7ab
+		summarizeBy: none
+		sourceColumn: ProductCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column DealType
+		dataType: string
+		lineageTag: 1b549642-775c-4171-8bc9-cac6459b7551
+		summarizeBy: none
+		sourceColumn: DealType
+
+		annotation SummarizationSetBy = Automatic
+
+	column ContractTerm
+		dataType: string
+		lineageTag: 9a12a205-33c7-4498-9c27-97914e409a95
+		summarizeBy: none
+		sourceColumn: ContractTerm
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesStage
+		dataType: string
+		lineageTag: 3ac43a3c-6324-46c6-bbf6-7cffb10a8ad3
+		summarizeBy: none
+		sourceColumn: SalesStage
+
+		annotation SummarizationSetBy = Automatic
+
+	column #Consolidated = "All"
+		lineageTag: f1199bdf-37d7-44d4-99b6-2b68b1fc3aa1
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Sales Transactions' = m
+		mode: import
+		queryGroup: FACT
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(FolderPath & "Sales_Transactions.csv"),
+				        [Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]
+				    ),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"CloseDate", type date}, {"BookingAmount", Currency.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

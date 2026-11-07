@@ -1,0 +1,150 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 77.513323098139253
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 268.52931081590634,
+            "y": 257.90796594471789
+          },
+          "nodeIndex": "Accounts",
+          "nodeLineageTag": "154c4137-d633-44ad-a8ee-ce11bf4de00c",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 520.91602958901558,
+            "y": 903.382547380132
+          },
+          "nodeIndex": "Date Table",
+          "nodeLineageTag": "f11f1bea-1c56-428a-af73-03187c0217c0",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 774.89601004909957,
+            "y": 280.70934710432175
+          },
+          "nodeIndex": "Sales Reps",
+          "nodeLineageTag": "123cfef4-7570-4087-b128-bd87230009e6",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 519.82932477298925,
+            "y": 559.58663503061234
+          },
+          "nodeIndex": "Sales Transactions",
+          "nodeLineageTag": "79f823ff-082b-44ab-80d9-0cefdc9e6b68",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1504.1679408219688,
+            "y": 307.71863838031209
+          },
+          "nodeIndex": "Measure",
+          "nodeLineageTag": "fd8c6212-020e-4554-aaf9-0f5e1a747473",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1505,
+            "y": 152.5
+          },
+          "nodeIndex": "#Aux_Measure_4",
+          "nodeLineageTag": "dcb24eb9-acd8-46b0-9090-8ff4706214e8",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1458.22670202461,
+            "y": 458.82061242013805
+          },
+          "nodeIndex": "MOB",
+          "nodeLineageTag": "78e85caa-8a3c-45d9-9c06-f3906bb6e886",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1540,
+            "y": 0
+          },
+          "nodeIndex": "#Aux_Details_4",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1570.9413783681875,
+            "y": 523.691273690066
+          },
+          "nodeIndex": "#Aux Fields",
+          "nodeLineageTag": "6d1e7c57-6373-4956-9ad8-d7ebae8b8805",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1555.4706891840938,
+            "y": 523.691273690066
+          },
+          "nodeIndex": "#Aux Detailed Measures",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 70.95554390096882,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

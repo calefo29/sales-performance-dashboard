@@ -1,0 +1,54 @@
+table '#Aux Detailed Measures'
+	lineageTag: b3be8e99-75ba-472c-84be-afce227f88b0
+
+	column '#Aux Deatailed Mesures'
+		lineageTag: 9de98a0a-491f-4fed-b570-2476cbd17734
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: '#Aux Deatailed Mesures Order'
+
+		relatedColumnDetails
+			groupByColumn: '#Aux Deatailed Mesures Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '#Aux Deatailed Mesures Fields'
+		isHidden
+		lineageTag: fc528d39-bcb8-4108-902d-4a5cd4c48a31
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: '#Aux Deatailed Mesures Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column '#Aux Deatailed Mesures Order'
+		isHidden
+		formatString: 0
+		lineageTag: e7cf72d0-753d-47b7-9be0-e47cb3f8bee2
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '#Aux Detailed Measures' = calculated
+		mode: import
+		source =
+				{
+				    ("Total Bookings", NAMEOF('Measure'[$ Total Bookings]), 0),
+				    ("Number of Deals", NAMEOF('Measure'[# Total Deals]), 1),
+				    ("Average Deal Closed", NAMEOF('Measure'[$ Average Deal Size (All)]), 2),
+				    ("Average Contract Size", NAMEOF('Measure'[$ Average New/Renewal Deal Size]), 3),
+				    ("Selling Reps", NAMEOF('Measure'[# Selling Reps]), 4),
+				    ("Bookings per Rep", NAMEOF('Measure'[$ Bookings per Rep]), 5),
+				    ("Accounts Covered", NAMEOF('Measure'[# Accounts Covered]), 6),
+				    ("Bookings per Account", NAMEOF('Measure'[$ Bookings per Account]), 7)
+				}
+
+	annotation PBI_Id = 8bb946b2268149eaadf54ead308706b9
+

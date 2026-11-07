@@ -1,0 +1,54 @@
+// ---------- 1. Grand total ----------
+EVALUATE
+ROW (
+    "Bookings",         [$ Total Bookings],
+    "Deals",            [$ Total Deals],
+    "Average Deal Size", [$ Average Deal Size (All)]
+)
+
+// ---------- 2. By account tier ----------
+EVALUATE
+SUMMARIZECOLUMNS (
+    Accounts[AccountTier],
+    "Bookings",          [$ Total Bookings],
+    "Deals",             [$ Total Deals],
+    "Average Deal Size", [$ Average Deal Size (All)]
+)
+
+// ---------- 3. By region ----------
+EVALUATE
+SUMMARIZECOLUMNS (
+    Accounts[Region],
+    "Bookings",          [$ Total Bookings],
+    "Deals",             [$ Total Deals],
+    "Average Deal Size", [$ Average Deal Size (All)]
+)
+
+// ---------- 4. By deal type — critical filter-context test ----------
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Sales Transactions'[DealType],
+    "Bookings",          [$ Total Bookings],
+    "Deals",             [$ Total Deals],
+    "Average Deal Size", [$ Average Deal Size (All)]
+)
+
+// ---------- 5. By sales rep segment ----------
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Sales Reps'[Segment],
+    "Bookings",          [$ Total Bookings],
+    "Deals",             [$ Total Deals],
+    "Average Deal Size", [$ Average Deal Size (All)]
+)
+
+// ---------- 6. By fiscal quarter ----------
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date Table'[FiscalYear],
+    'Date Table'[FiscalQuarter],
+    "Bookings",          [$ Total Bookings],
+    "Deals",             [$ Total Deals],
+    "Average Deal Size", [$ Average Deal Size (All)]
+)
+ORDER BY 'Date Table'[FiscalYear], 'Date Table'[FiscalQuarter]
